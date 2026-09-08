@@ -13,7 +13,7 @@ import jakarta.persistence.Table;
  * record: the record is the API shape and must not change when the storage does.
  */
 @Entity
-@Table(name = "task")
+@Table(name = "tasks")
 public class TaskEntity {
 
     @Id
