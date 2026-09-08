@@ -47,5 +47,7 @@ rewritten.
 | GET | `/api/v1/health` | `{"status":"ok"}` |
 | POST | `/api/v1/tasks` | 201 and the created task |
 | GET | `/api/v1/tasks` | all tasks |
+| POST | `/api/v1/tasks/{taskId}/comments` | 201 and the created comment |
+| GET | `/api/v1/tasks/{taskId}/comments` | a task's comments, newest first |
 
 The `/api/v1` prefix is fixed. New resources go under it.

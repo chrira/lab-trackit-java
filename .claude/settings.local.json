@@ -5,7 +5,10 @@
       "Bash(npx vue-tsc *)",
       "Bash(echo exit code: $? *)",
       "Bash(echo \"exit code: $?\")",
-      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(json.dumps\\(d['artifacts'], indent=2\\)\\)\")"
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(json.dumps\\(d['artifacts'], indent=2\\)\\)\")",
+      "Bash(./mvnw -q -o compile)",
+      "Bash(./mvnw -q compile)",
+      "Bash(./mvnw -q test-compile)"
     ]
   },
   "enabledMcpjsonServers": [
