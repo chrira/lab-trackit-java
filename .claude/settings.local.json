@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./mvnw test *)",
+      "Bash(npx vue-tsc *)",
+      "Bash(echo exit code: $? *)",
+      "Bash(echo \"exit code: $?\")"
+    ]
+  },
+  "enabledMcpjsonServers": [
+    "context7",
+    "github"
+  ],
+  "enabledPlugins": {
+    "commit-commands@claude-plugins-official": true
+  }
+}
