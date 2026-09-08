@@ -25,10 +25,11 @@ Adding a dependency needs the user's agreement first. Say which ones you need an
    - `org.postgresql:postgresql` at `runtime` scope
 
 2. **Entity.** Create `domain/<Thing>Entity.java`. A separate class from the record,
-   never the record with annotations on it. `@Entity`, `@Table(name = "<thing>")`,
-   `@Id @GeneratedValue(strategy = GenerationType.IDENTITY)`, and enums stored with
-   `@Enumerated(EnumType.STRING)`. Give it a `toDomain()` returning the record, and a
-   protected no-arg constructor for JPA.
+   never the record with annotations on it. `@Entity`, `@Table(name = "<things>")`
+   (plural snake_case - the common SQL convention for a table of rows, e.g. `tasks`
+   for `TaskEntity`), `@Id @GeneratedValue(strategy = GenerationType.IDENTITY)`, and
+   enums stored with `@Enumerated(EnumType.STRING)`. Give it a `toDomain()` returning
+   the record, and a protected no-arg constructor for JPA.
 
 3. **Repository.** Create `repository/<Thing>Repository.java`, an interface extending
    `JpaRepository<<Thing>Entity, Long>`. Nothing else in it unless a query is needed.

@@ -1,31 +1,34 @@
 package ch.acend.trackit.service;
 
 import ch.acend.trackit.domain.Task;
+import ch.acend.trackit.domain.TaskEntity;
 import ch.acend.trackit.domain.TaskStatus;
 import ch.acend.trackit.dto.CreateTaskRequest;
+import ch.acend.trackit.repository.TaskRepository;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.atomic.AtomicLong;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-/** Business logic for tasks. Holds them in memory until M2 adds persistence. */
+/** Business logic for tasks, backed by PostgreSQL. */
 @Service
 public class TaskService {
 
-    private final List<Task> tasks = new CopyOnWriteArrayList<>();
-    private final AtomicLong nextId = new AtomicLong(1);
+    private final TaskRepository taskRepository;
 
-    public Task create(CreateTaskRequest request) {
-        Task task = new Task(
-                nextId.getAndIncrement(),
-                request.title(),
-                request.project(),
-                TaskStatus.OPEN);
-        tasks.add(task);
-        return task;
+    public TaskService(TaskRepository taskRepository) {
+        this.taskRepository = taskRepository;
     }
 
+    @Transactional
+    public Task create(CreateTaskRequest request) {
+        TaskEntity entity = new TaskEntity(request.title(), request.project(), TaskStatus.OPEN);
+        return taskRepository.save(entity).toDomain();
+    }
+
+    @Transactional(readOnly = true)
     public List<Task> findAll() {
-        return List.copyOf(tasks);
+        return taskRepository.findAll().stream()
+                .map(TaskEntity::toDomain)
+                .toList();
     }
 }

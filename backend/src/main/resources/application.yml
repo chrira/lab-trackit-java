@@ -1,5 +1,14 @@
 spring:
   application:
     name: trackit
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/trackit}
+    username: ${DB_USERNAME:trackit}
+    password: ${DB_PASSWORD:trackit}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
 server:
   port: 8080

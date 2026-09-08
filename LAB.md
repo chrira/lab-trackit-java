@@ -31,6 +31,7 @@ write no skill, agent or configuration file in either.
 Part 3 is advanced and optional. Nothing later in the day depends on it. If you finish
 Part 1 early, go to task A2, it is the most useful one.
 
+
 ## What you record today
 
 The fifteen-minute discussion at the end runs on your answers, and every one of them is

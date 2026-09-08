@@ -47,6 +47,7 @@ This is the Java line of the TrackIt lab project. The Python line lives in
 - The JPA entity is a SEPARATE class in `domain`, e.g. `TaskEntity`. Never annotate
   the record - the record stays the API shape when the storage changes
 - One `*Repository` interface per entity, extending `JpaRepository`
+- Table names are plural snake_case, e.g. `tasks` for `TaskEntity`
 - The schema is created by a Flyway migration, never by `ddl-auto`.
   `spring.jpa.hibernate.ddl-auto` MUST be `validate`
 - Migrations are named `V<n>__<snake_case_description>.sql` and are never edited

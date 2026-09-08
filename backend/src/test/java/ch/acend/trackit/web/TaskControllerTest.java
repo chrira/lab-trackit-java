@@ -5,16 +5,19 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import ch.acend.trackit.domain.Task;
+import ch.acend.trackit.domain.TaskStatus;
 import ch.acend.trackit.service.TaskService;
+import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(TaskController.class)
-@Import(TaskService.class)
 class TaskControllerTest {
 
     private static final String ONE_TASK = """
@@ -24,8 +27,14 @@ class TaskControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @MockitoBean
+    private TaskService taskService;
+
     @Test
     void postTaskReturnsCreated() throws Exception {
+        BDDMockito.given(taskService.create(BDDMockito.any()))
+                .willReturn(new Task(1L, "Write the context file", "trackit", TaskStatus.OPEN));
+
         mockMvc.perform(post("/api/v1/tasks")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(ONE_TASK))
@@ -45,10 +54,8 @@ class TaskControllerTest {
 
     @Test
     void getTasksReturnsThePostedTask() throws Exception {
-        mockMvc.perform(post("/api/v1/tasks")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(ONE_TASK))
-                .andExpect(status().isCreated());
+        BDDMockito.given(taskService.findAll())
+                .willReturn(List.of(new Task(1L, "Write the context file", "trackit", TaskStatus.OPEN)));
 
         mockMvc.perform(get("/api/v1/tasks"))
                 .andExpect(status().isOk())

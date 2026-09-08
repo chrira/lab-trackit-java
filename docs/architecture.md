@@ -38,7 +38,8 @@ origin, so there is no CORS configuration to get wrong.
 PostgreSQL 17, started from `compose.yaml` in the repo root. The schema is owned by
 Flyway migrations in `backend/src/main/resources/db/migration/`. Hibernate runs with
 `ddl-auto: validate` so a drifted schema fails at startup instead of being silently
-rewritten.
+rewritten. Tables are named plural snake_case (e.g. `tasks`), the common SQL
+convention for a table holding a collection of rows.
 
 ## Endpoints
 
