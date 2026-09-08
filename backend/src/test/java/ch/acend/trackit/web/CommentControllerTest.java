@@ -2,14 +2,19 @@ package ch.acend.trackit.web;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import ch.acend.trackit.domain.Comment;
 import ch.acend.trackit.dto.CreateCommentRequest;
+import ch.acend.trackit.dto.UpdateCommentRequest;
+import ch.acend.trackit.service.CommentNotFoundException;
 import ch.acend.trackit.service.CommentService;
 import ch.acend.trackit.service.TaskNotFoundException;
 import java.time.Instant;
@@ -111,6 +116,84 @@ class CommentControllerTest {
         when(commentService.findByTask(404L)).thenThrow(new TaskNotFoundException(404L));
 
         mockMvc.perform(get("/api/v1/tasks/404/comments"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void patchCommentReturnsOk() throws Exception {
+        Comment updated = new Comment(1L, 1L, "jo", "Turned out fine after all.", STORED_COMMENT.createdAt());
+        when(commentService.update(eq(1L), eq(1L), any(UpdateCommentRequest.class))).thenReturn(updated);
+
+        mockMvc.perform(patch("/api/v1/tasks/1/comments/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"body\":\"Turned out fine after all.\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.author").value("jo"))
+                .andExpect(jsonPath("$.body").value("Turned out fine after all."));
+    }
+
+    @Test
+    void patchCommentWithEmptyBodyReturnsBadRequest() throws Exception {
+        mockMvc.perform(patch("/api/v1/tasks/1/comments/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"body\":\"\"}"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void patchCommentLongerThanTheLimitReturnsBadRequest() throws Exception {
+        String tooLong = "a".repeat(501);
+
+        mockMvc.perform(patch("/api/v1/tasks/1/comments/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"body\":\"" + tooLong + "\"}"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void patchUnknownCommentReturnsNotFound() throws Exception {
+        when(commentService.update(eq(1L), eq(404L), any(UpdateCommentRequest.class)))
+                .thenThrow(new CommentNotFoundException(1L, 404L));
+
+        mockMvc.perform(patch("/api/v1/tasks/1/comments/404")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"body\":\"Doesn't matter.\"}"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void patchCommentForWrongTaskReturnsNotFound() throws Exception {
+        when(commentService.update(eq(2L), eq(1L), any(UpdateCommentRequest.class)))
+                .thenThrow(new CommentNotFoundException(2L, 1L));
+
+        mockMvc.perform(patch("/api/v1/tasks/2/comments/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"body\":\"Doesn't matter.\"}"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void deleteCommentReturnsNoContent() throws Exception {
+        mockMvc.perform(delete("/api/v1/tasks/1/comments/1"))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void deleteUnknownCommentReturnsNotFound() throws Exception {
+        doThrow(new CommentNotFoundException(1L, 404L))
+                .when(commentService).delete(1L, 404L);
+
+        mockMvc.perform(delete("/api/v1/tasks/1/comments/404"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void deleteCommentForWrongTaskReturnsNotFound() throws Exception {
+        doThrow(new CommentNotFoundException(2L, 1L))
+                .when(commentService).delete(2L, 1L);
+
+        mockMvc.perform(delete("/api/v1/tasks/2/comments/1"))
                 .andExpect(status().isNotFound());
     }
 }

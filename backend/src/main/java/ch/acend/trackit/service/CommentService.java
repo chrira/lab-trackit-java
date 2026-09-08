@@ -3,6 +3,7 @@ package ch.acend.trackit.service;
 import ch.acend.trackit.domain.Comment;
 import ch.acend.trackit.domain.CommentEntity;
 import ch.acend.trackit.dto.CreateCommentRequest;
+import ch.acend.trackit.dto.UpdateCommentRequest;
 import ch.acend.trackit.repository.CommentRepository;
 import ch.acend.trackit.repository.TaskRepository;
 import java.util.List;
@@ -37,9 +38,31 @@ public class CommentService {
                 .toList();
     }
 
+    @Transactional
+    public Comment update(long taskId, long commentId, UpdateCommentRequest request) {
+        CommentEntity comment = requireComment(taskId, commentId);
+        comment.setBody(request.body());
+        return comment.toDomain();
+    }
+
+    @Transactional
+    public void delete(long taskId, long commentId) {
+        CommentEntity comment = requireComment(taskId, commentId);
+        commentRepository.delete(comment);
+    }
+
     private void requireTask(long taskId) {
         if (!taskRepository.existsById(taskId)) {
             throw new TaskNotFoundException(taskId);
         }
+    }
+
+    private CommentEntity requireComment(long taskId, long commentId) {
+        CommentEntity comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new CommentNotFoundException(taskId, commentId));
+        if (!comment.getTaskId().equals(taskId)) {
+            throw new CommentNotFoundException(taskId, commentId);
+        }
+        return comment;
     }
 }

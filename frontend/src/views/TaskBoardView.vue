@@ -53,7 +53,7 @@ onMounted(load);
     <ul v-else class="task-list">
       <li v-for="task in tasks" :key="task.id">
         <span class="status" :data-status="task.status">{{ task.status }}</span>
-        <span class="title">{{ task.title }}</span>
+        <router-link class="title" :to="`/tasks/${task.id}`">{{ task.title }}</router-link>
         <span class="project">{{ task.project }}</span>
       </li>
     </ul>
@@ -110,6 +110,11 @@ onMounted(load);
 }
 .title {
   flex: 1;
+  color: inherit;
+  text-decoration: none;
+}
+.title:hover {
+  text-decoration: underline;
 }
 .project {
   color: #6b7a80;
